@@ -9,6 +9,24 @@ description: What's new in AI Brain Starter — plain English, no jargon
 
 ---
 
+## 2026-09-13: dates with slashes were merging unrelated notes in the graph
+
+**Who this affects:** anyone whose vault is not in English — Spanish, Portuguese, French and German all write dates as DD/MM/YYYY.
+
+`graphify_canonicalize.py` collapses path-form wikilinks so that `[[Curiosities/Colombia]]` and `[[Colombia]]` end up as one node. It did that by keeping whatever follows the last `/`.
+
+In English that is safe, because a `/` in a label is a path. In Spanish it is also the date separator and the rate separator, so `Sesion del 24/08/2026` became `2026` and `$49/mes` became `mes`.
+
+**The consequence is not a cosmetic one.** Every dated note in the corpus canonicalized onto the *same* node, and merging them made them all neighbours of each other. On an 8,858-node Spanish vault that produced 12 supernodes holding **119 edges that appear in no source document**. `2026` came out as the #7 god node with 31 edges, joining notes with nothing in common. Community detection and the "surprising connections" report both read those edges and neither can tell them from real ones.
+
+The fix is one rule: **a digit immediately before the `/` means it is not a folder path**, plus a small set of unit tails for the `$49/mes` shape. Real path-form wikilinks still collapse exactly as before.
+
+Regression test in `tests/test_graphify_canonicalize_slash_guard.py`. It fails on all six shapes against the previous code.
+
+If you already have a graph built from a non-English vault, the bad nodes are still in it — they are the bare years, day numbers and unit words near the top of your god-node list. Rebuild, or delete those nodes and re-cluster.
+
+---
+
 ## 2026-09-09: the NVIDIA grunt-work models are back — and the map now tells you it will rot
 
 **Who this affects:** anyone using `scripts/nvidia.sh` or `_nvidia_router.py` to send cheap, bulk work to NVIDIA's free tier instead of Claude.
