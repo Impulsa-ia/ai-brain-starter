@@ -301,7 +301,7 @@ def main():
         print(f"not found: {src}", file=sys.stderr)
         sys.exit(1)
 
-    extraction = json.loads(src.read_text())
+    extraction = json.loads(src.read_text(encoding="utf-8"))
     print(f"input: {len(extraction.get('nodes', []))} nodes, "
           f"{len(extraction.get('edges', []))} edges, "
           f"{len(extraction.get('hyperedges', []))} hyperedges")
